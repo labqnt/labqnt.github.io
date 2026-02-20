@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QNT Lab — Quantum Nano Theory</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #04080f; --bg2: #080e1a;
+    --accent: #00d4ff; --accent2: #7b2fff;
+    --gold: #f0c040; --white: #e8edf5;
+    --mid: #7a8899; --border: rgba(0,212,255,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    background:var(--bg); color:var(--white);
+    font-family:'DM Sans',sans-serif; font-weight:300;
+    overflow-x:hidden; min-height:100vh;
+  }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+    background-size:60px 60px; pointer-events:none; z-index:0;
+  }
+
+  /* NAV */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1.2rem 4rem;
+    backdrop-filter:blur(16px);
+    background:rgba(4,8,15,0.88);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-logo {
+    font-family:'Bebas Neue',sans-serif; font-size:1.6rem;
+    letter-spacing:.12em; color:var(--accent); cursor:pointer; user-select:none;
+  }
+  .nav-logo span { color:var(--white); }
+  nav ul { list-style:none; display:flex; gap:2.5rem; }
+  nav ul li {
+    font-family:'Space Mono',monospace; font-size:.72rem;
+    letter-spacing:.12em; text-transform:uppercase;
+    color:var(--mid); cursor:pointer;
+    padding-bottom:2px; border-bottom:1px solid transparent;
+    transition:color .2s, border-color .2s;
+  }
+  nav ul li:hover { color:var(--accent); }
+  nav ul li.active { color:var(--accent); border-color:var(--accent); }
+
+  /* PAGE SYSTEM */
+  .page { display:none; position:relative; z-index:1; min-height:100vh; }
+  .page.active { display:block; }
+
+  /* HOME */
+  #page-home {
+    display:none; align-items:center; justify-content:center;
+    text-align:center; padding:8rem 2rem 4rem; overflow:hidden;
+  }
+  #page-home.active { display:flex; }
+
+  .orb { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; }
+  .orb1 {
+    width:520px; height:520px;
+    background:radial-gradient(circle, rgba(0,212,255,0.18), transparent 70%);
+    top:-120px; left:-100px;
+    animation:drift1 12s ease-in-out infinite alternate;
+  }
+  .orb2 {
+    width:400px; height:400px;
+    background:radial-gradient(circle, rgba(123,47,255,0.2), transparent 70%);
+    bottom:0; right:-60px;
+    animation:drift2 14s ease-in-out infinite alternate;
+  }
+  @keyframes drift1 { to { transform:translate(60px,40px); } }
+  @keyframes drift2 { to { transform:translate(-40px,-60px); } }
+
+  .hero-eyebrow {
+    font-family:'Space Mono',monospace; font-size:.72rem;
+    letter-spacing:.25em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:1.5rem;
+    animation:fadeUp .8s .2s both;
+  }
+  h1 {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(5rem,13vw,11rem); line-height:.92; letter-spacing:.04em;
+    background:linear-gradient(135deg, var(--white) 40%, var(--accent) 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    animation:fadeUp .8s .4s both;
+  }
+  .hero-sub {
+    margin-top:2rem; font-size:1.1rem; color:var(--mid);
+    max-width:520px; line-height:1.7; animation:fadeUp .8s .6s both;
+  }
+  .hero-cta { display:inline-flex; gap:1rem; margin-top:2.8rem; animation:fadeUp .8s .8s both; }
+  .btn {
+    font-family:'Space Mono',monospace; font-size:.72rem;
+    letter-spacing:.1em; text-transform:uppercase; padding:.85rem 2rem;
+    border-radius:2px; cursor:pointer; border:none; transition:all .25s;
+  }
+  .btn-primary { background:var(--accent); color:#000; }
+  .btn-primary:hover { background:#fff; }
+  .btn-ghost { border:1px solid var(--border); background:transparent; color:var(--mid); }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* INNER PAGES */
+  .page-inner { max-width:1100px; margin:0 auto; padding:7rem 2rem 5rem; }
+  .section-tag {
+    font-family:'Space Mono',monospace; font-size:.68rem;
+    letter-spacing:.22em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:.8rem;
+  }
+  h2 {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(2.8rem,6vw,5rem); letter-spacing:.05em; line-height:1; margin-bottom:2rem;
+  }
+
+  /* RESEARCH */
+  .research-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:1.5rem; margin-top:3rem;
+  }
+  .research-card {
+    border:1px solid var(--border); padding:2rem; position:relative;
+    background:rgba(255,255,255,0.02); transition:border-color .25s, transform .25s; overflow:hidden;
+  }
+  .research-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, var(--accent), var(--accent2));
+    transform:scaleX(0); transform-origin:left; transition:transform .4s;
+  }
+  .research-card:hover { border-color:rgba(0,212,255,0.4); transform:translateY(-4px); }
+  .research-card:hover::before { transform:scaleX(1); }
+  .card-num { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; color:rgba(0,212,255,0.1); line-height:1; margin-bottom:.5rem; }
+  .card-title { font-size:1.05rem; font-weight:500; margin-bottom:.8rem; }
+  .card-desc { font-size:.88rem; color:var(--mid); line-height:1.7; }
+
+  /* PUBLICATIONS */
+  .pub-year-group { margin-top:2.5rem; }
+  .pub-year-header { display:flex; align-items:center; gap:1rem; margin-bottom:1rem; }
+  .pub-year-label { font-family:'Bebas Neue',sans-serif; font-size:2.2rem; color:var(--accent); opacity:.5; line-height:1; }
+  .pub-year-line { flex:1; height:1px; background:linear-gradient(90deg, rgba(0,212,255,0.3), transparent); }
+  .pub-item {
+    display:grid; grid-template-columns:1fr auto;
+    gap:1rem; align-items:start;
+    padding:1.2rem; border:1px solid transparent;
+    transition:border-color .2s, background .2s; margin-bottom:2px;
+  }
+  .pub-item:hover { border-color:var(--border); background:rgba(0,212,255,0.03); }
+  .pub-title { font-size:.95rem; font-weight:500; margin-bottom:.3rem; line-height:1.4; }
+  .pub-meta { font-size:.82rem; color:var(--mid); font-style:italic; }
+  .pub-journal { font-size:.78rem; color:var(--accent); margin-top:.25rem; font-family:'Space Mono',monospace; }
+  .pub-link {
+    font-family:'Space Mono',monospace; font-size:.65rem; color:var(--accent);
+    text-decoration:none; border:1px solid var(--border); padding:.35rem .7rem;
+    white-space:nowrap; transition:background .2s, color .2s; align-self:start; margin-top:.1rem;
+  }
+  .pub-link:hover { background:var(--accent); color:#000; }
+
+  /* MEMBERS */
+  .member-group { margin-top:3rem; }
+  .member-group + .member-group { margin-top:2.5rem; }
+  .member-category-header { display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; }
+  .member-category-label {
+    font-family:'Space Mono',monospace; font-size:.68rem;
+    text-transform:uppercase; letter-spacing:.2em; color:var(--accent); white-space:nowrap;
+  }
+  .member-category-line { flex:1; height:1px; background:linear-gradient(90deg, rgba(0,212,255,0.35), transparent); }
+  .members-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:1.2rem; }
+  .member-card {
+    text-align:center; padding:2rem 1rem;
+    border:1px solid var(--border); background:rgba(255,255,255,0.02);
+    transition:border-color .2s, transform .2s;
+  }
+  .member-card:hover { border-color:rgba(0,212,255,0.4); transform:translateY(-3px); }
+  .member-card.pi { border-color:rgba(0,212,255,0.25); }
+  .member-card.pi .member-avatar { background:linear-gradient(135deg,#00d4ff,#0080a0); }
+  .member-avatar {
+    width:72px; height:72px; border-radius:50%;
+    background:linear-gradient(135deg, var(--accent2), var(--accent));
+    margin:0 auto 1rem; display:flex; align-items:center; justify-content:center;
+    font-family:'Bebas Neue',sans-serif; font-size:1.6rem; color:#fff;
+  }
+  .member-name { font-weight:500; font-size:.95rem; margin-bottom:.3rem; }
+  .member-role { font-family:'Space Mono',monospace; font-size:.65rem; color:var(--accent); text-transform:uppercase; letter-spacing:.1em; }
+  .member-info { font-size:.78rem; color:var(--mid); margin-top:.4rem; line-height:1.5; }
+
+  /* NEWS */
+  .news-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; margin-top:3rem; }
+  .news-card { border:1px solid var(--border); padding:1.8rem; background:rgba(255,255,255,0.02); transition:border-color .2s; }
+  .news-card:hover { border-color:rgba(0,212,255,0.4); }
+  .news-date { font-family:'Space Mono',monospace; font-size:.68rem; color:var(--gold); margin-bottom:.8rem; }
+  .news-title { font-size:1rem; font-weight:500; margin-bottom:.7rem; line-height:1.4; }
+  .news-body { font-size:.85rem; color:var(--mid); line-height:1.7; }
+
+  /* CONTACT */
+  .contact-wrap { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:start; }
+  .contact-info p { font-size:.95rem; color:var(--mid); line-height:2; margin-bottom:2rem; }
+  .info-row { display:flex; gap:1rem; align-items:baseline; padding:.6rem 0; border-bottom:1px solid var(--border); }
+  .info-label { font-family:'Space Mono',monospace; font-size:.65rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent); min-width:90px; }
+  .info-val { font-size:.9rem; color:var(--mid); }
+  .contact-form { display:flex; flex-direction:column; gap:1rem; }
+  .contact-form input, .contact-form textarea {
+    background:rgba(255,255,255,0.03); border:1px solid var(--border);
+    color:var(--white); font-family:'DM Sans',sans-serif; font-size:.9rem;
+    padding:.9rem 1.2rem; outline:none; transition:border-color .2s; resize:none; border-radius:0;
+  }
+  .contact-form input:focus, .contact-form textarea:focus { border-color:var(--accent); }
+  .contact-form input::placeholder, .contact-form textarea::placeholder { color:var(--mid); }
+  .contact-form textarea { min-height:130px; }
+  .contact-form button {
+    font-family:'Space Mono',monospace; font-size:.72rem; letter-spacing:.12em;
+    text-transform:uppercase; padding:1rem; background:var(--accent); color:#000;
+    border:none; cursor:pointer; transition:background .2s;
+  }
+  .contact-form button:hover { background:#fff; }
+
+  /* FOOTER */
+  footer {
+    border-top:1px solid var(--border); padding:2.5rem 4rem;
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:1rem; background:var(--bg); position:relative; z-index:1;
+  }
+  .footer-logo { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:.1em; color:var(--accent); }
+  footer p { font-family:'Space Mono',monospace; font-size:.65rem; color:var(--mid); }
+
+  @media (max-width:768px) {
+    nav { padding:1rem 1.5rem; }
+    nav ul { gap:1.2rem; }
+    nav ul li { font-size:.6rem; }
+    .contact-wrap { grid-template-columns:1fr; gap:2rem; }
+    .pub-item { grid-template-columns:1fr; }
+    footer { flex-direction:column; padding:2rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">QNT<span> Lab</span></div>
+  <ul>
+    <li id="nav-research"     onclick="showPage('research')">Research</li>
+    <li id="nav-publications" onclick="showPage('publications')">Publications</li>
+    <li id="nav-members"      onclick="showPage('members')">Members</li>
+    <li id="nav-news"         onclick="showPage('news')">News</li>
+    <li id="nav-contact"      onclick="showPage('contact')">Contact</li>
+  </ul>
+</nav>
+
+<!-- ══ HOME ══ -->
+<div class="page" id="page-home">
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+  <div style="position:relative;z-index:1;text-align:center;">
+    <p class="hero-eyebrow">Department of Physics · Pukyong National University</p>
+    <h1>Quantum<br>Nano<br>Theory</h1>
+    <p class="hero-sub">Mesoscopic physics at the frontier — exploring quantum transport, non-Hermitian topology, and nanoscale phenomena in condensed matter and photonic systems.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" onclick="showPage('research')">Our Research</button>
+      <button class="btn btn-ghost"   onclick="showPage('publications')">Publications</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RESEARCH ══ -->
+<div class="page" id="page-research">
+  <div class="page-inner">
+    <p class="section-tag">// Research Areas</p>
+    <h2>What We Study</h2>
+    <p style="color:var(--mid);max-width:600px;line-height:1.7;font-size:.95rem;">Our group investigates quantum and nanoscale systems using theoretical and computational methods, spanning mesoscopic transport, topological phases, non-Hermitian physics, and nanomechanics.</p>
+    <div class="research-grid">
+      <div class="research-card">
+        <div class="card-num">01</div>
+        <div class="card-title">Mesoscopic Quantum Transport</div>
+        <div class="card-desc">Electron transport in mesoscopic systems including topological insulators, graphene, 2D materials, Chern insulators, and superconducting nanostructures.</div>
+      </div>
+      <div class="research-card">
+        <div class="card-num">02</div>
+        <div class="card-title">Non-Hermitian Topology</div>
+        <div class="card-desc">Topological phases in non-Hermitian systems — skin effects, exceptional points, Hopf bundle matter, and bulk-boundary correspondence beyond the Hermitian paradigm.</div>
+      </div>
+      <div class="research-card">
+        <div class="card-num">03</div>
+        <div class="card-title">Photonic &amp; Wave Chaos</div>
+        <div class="card-desc">Wave chaos in optical microcavities and photonic crystals, Bloch-theorem-dictated quantum scar modes, and moiré photonic superlattices.</div>
+      </div>
+      <div class="research-card">
+        <div class="card-num">04</div>
+        <div class="card-title">Flat Bands &amp; Localization</div>
+        <div class="card-desc">Compact localized states, symmetry-protected flat bands, dynamical localization in driven quantum systems, and topological flat band formation in moiré systems.</div>
+      </div>
+      <div class="research-card">
+        <div class="card-num">05</div>
+        <div class="card-title">Nano-Electromechanical Systems</div>
+        <div class="card-desc">Quantum phenomena in nanomechanical resonators, Cooper pair box qubits, diamond nanomechanical mass spectrometry, and quasiparticle dynamics in superconducting qubits.</div>
+      </div>
+      <div class="research-card">
+        <div class="card-num">06</div>
+        <div class="card-title">Graphene &amp; 2D Valleytronics</div>
+        <div class="card-desc">Valley isospin manipulation in strained graphene, graphene qubits via strain engineering, and quantum transport in graphene p-n junctions and Chern insulator junctions.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PUBLICATIONS ══ -->
+<div class="page" id="page-publications">
+  <div class="page-inner">
+    <p class="section-tag">// Publications</p>
+    <h2>All Papers</h2>
+    <p style="color:var(--mid);font-size:.88rem;margin-bottom:.5rem;">Complete publication list of Prof. Hee Chul Park &nbsp;·&nbsp; <a href="https://scholar.google.com/citations?user=0IigmmoAAAAJ&hl=ko" target="_blank" style="color:var(--accent);">Google Scholar ↗</a></p>
+
+    <!-- 2025 -->
+    <div class="pub-year-group">
+      <div class="pub-year-header"><span class="pub-year-label">2025</span><div class="pub-year-line"></div></div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Diamond Molecular Balance: Ultra-Wide Range Nanomechanical Mass Spectrometry from MDa to TDa</div>
+          <div class="pub-meta">Hee Chul Park, Sang-Wook Han, Chulki Kim et al.</div>
+          <div class="pub-journal">Nano Letters 25, 10497–10503 (2025)</div>
+        </div>
+        <a href="https://pubs.acs.org/doi/10.1021/acs.nanolett.5c02032" target="_blank" class="pub-link">DOI ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Nonorientable Exceptional Points in the Klein Brillouin Zone</div>
+          <div class="pub-meta">Jung-Wan Ryu, Jae-Ho Han, Moon Jip Park, Hee Chul Park, Chang-Hwan Yi</div>
+          <div class="pub-journal">Physical Review A 112, 052223 (2025)</div>
+        </div>
+        <a href="https://arxiv.org/" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Pseudo-Hermitian Topology of Multiband Non-Hermitian Systems</div>
+          <div class="pub-meta">Jung-Wan Ryu, Jae-Ho Han, Chang-Hwan Yi, Hee Chul Park, Moon Jip Park</div>
+          <div class="pub-journal">Physical Review A 111, 042205 (2025)</div>
+        </div>
+        <a href="https://arxiv.org/abs/2308.14997" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Non-Hermitian Skin Effect via Floquet-Driven Photonic Topological Insulators</div>
+          <div class="pub-meta">Jagang Park, Kyungmin Lee, Ruo-Yang Zhang, Hee-Chul Park, Jung-Wan Ryu et al.</div>
+          <div class="pub-journal">Physical Review Letters 135, 133801 (2025)</div>
+        </div>
+        <a href="https://arxiv.org/" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Evidence for Unexpectedly Low Quasiparticle Generation Rates across Josephson Junctions of Driven Superconducting Qubits</div>
+          <div class="pub-meta">Byoung-moo Ann, Sang-Jun Choi, Hee Chul Park, Sercan Deve et al.</div>
+          <div class="pub-journal">arXiv:2511.22930 (2025)</div>
+        </div>
+        <a href="https://arxiv.org/abs/2511.22930" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+    </div>
+
+    <!-- 2024 -->
+    <div class="pub-year-group">
+      <div class="pub-year-header"><span class="pub-year-label">2024</span><div class="pub-year-line"></div></div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Realization of Geometric-Phase Topology Induced by Multiple Exceptional Points</div>
+          <div class="pub-meta">Hee Chul Park et al.</div>
+          <div class="pub-journal">Physical Review A (2024) · arXiv:2408.16302</div>
+        </div>
+        <a href="https://arxiv.org/abs/2408.16302" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Exceptional Classifications of Non-Hermitian Systems</div>
+          <div class="pub-meta">Jung-Wan Ryu, Jae-Ho Han, Chang-Hwan Yi, Moon Jip Park, Hee Chul Park</div>
+          <div class="pub-journal">Communications Physics 7, 109 (2024)</div>
+        </div>
+        <a href="https://www.nature.com/articles/s42005-024-01595-9" target="_blank" class="pub-link">DOI ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Engineering High Chern Number Insulators</div>
+          <div class="pub-meta">Sungjong Woo, Seungbum Woo, Jung-Wan Ryu, Hee Chul Park</div>
+          <div class="pub-journal">arXiv:2407.16225 (2024)</div>
+        </div>
+        <a href="https://arxiv.org/abs/2407.16225" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Revealing Non-Hermitian Band Structure of Photonic Floquet Media</div>
+          <div class="pub-meta">Jagang Park, Hyukjoon Cho, Hee Chul Park, Jung-Wan Ryu, Namkyoo Park, Bumki Min et al.</div>
+          <div class="pub-journal">Science Advances (2024) · abo6220</div>
+        </div>
+        <a href="https://www.science.org/doi/10.1126/sciadv.abo6220" target="_blank" class="pub-link">DOI ↗</a>
+      </div>
+    </div>
+
+    <!-- 2023 -->
+    <div class="pub-year-group">
+      <div class="pub-year-header"><span class="pub-year-label">2023</span><div class="pub-year-line"></div></div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Bloch Theorem Dictated Wave Chaos in Microcavity Crystals</div>
+          <div class="pub-meta">Chang-Hwan Yi, Hee Chul Park, Moon Jip Park</div>
+          <div class="pub-journal">Light: Science &amp; Applications 12, 106 (2023)</div>
+        </div>
+        <a href="https://arxiv.org/abs/2306.06967" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Realization of Non-Hermitian Hopf Bundle Matter</div>
+          <div class="pub-meta">Yung Kim, Hee Chul Park, Minwook Kyung, Kyungmin Lee, Jung-Wan Ryu, Oubo You, Shuang Zhang, Bumki Min, Moon Jip Park</div>
+          <div class="pub-journal">Communications Physics 6, 273 (2023)</div>
+        </div>
+        <a href="https://www.nature.com/articles/s42005-023-01381-z" target="_blank" class="pub-link">DOI ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Symmetry-Protected Flatband Condition for Hamiltonians with Local Symmetry</div>
+          <div class="pub-meta">Jung-Wan Ryu, Alexei Andreanov, Hee Chul Park, Jae-Ho Han</div>
+          <div class="pub-journal">Physical Review B (2024) · arXiv:2308.14997</div>
+        </div>
+        <a href="https://arxiv.org/abs/2308.14997" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Photonic Quantum Hall Effect Based on Anomalous Floquet Topological Insulator</div>
+          <div class="pub-meta">Tara Kit, Kimsay Pov, Kimleang Kea, Won-Du Chang, Hee Chul Park, Youngsun Han</div>
+          <div class="pub-journal">Laser Physics Letters 21, 015203 (2023)</div>
+        </div>
+        <a href="https://arxiv.org/" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+    </div>
+
+    <!-- 2022 -->
+    <div class="pub-year-group">
+      <div class="pub-year-header"><span class="pub-year-label">2022</span><div class="pub-year-line"></div></div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Strong Interlayer Coupling and Stable Topological Flat Bands in Twisted Bilayer Photonic Moiré Superlattices</div>
+          <div class="pub-meta">Chang-Hwan Yi, Hee Chul Park, Moon Jip Park</div>
+          <div class="pub-journal">Light: Science &amp; Applications 11, 289 (2022)</div>
+        </div>
+        <a href="https://arxiv.org/abs/2108.14002" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+    </div>
+
+    <!-- 2021 -->
+    <div class="pub-year-group">
+      <div class="pub-year-header"><span class="pub-year-label">2021</span><div class="pub-year-line"></div></div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">A Strain-Engineered Graphene Qubit in a Nanobubble</div>
+          <div class="pub-meta">Nojoon Myoung, JungYun Han, Hee Chul Park</div>
+          <div class="pub-journal">arXiv:2111.12245 (2021)</div>
+        </div>
+        <a href="https://arxiv.org/abs/2111.12245" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Higher-Order Topological Instanton Tunneling Oscillation</div>
+          <div class="pub-meta">Moon Jip Park, Sunam Jeon, SungBin Lee, Hee Chul Park, Youngkuk Kim</div>
+          <div class="pub-journal">Carbon 174 (2021)</div>
+        </div>
+        <a href="https://arxiv.org/abs/2006.01111" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+    </div>
+
+    <!-- 2020 -->
+    <div class="pub-year-group">
+      <div class="pub-year-header"><span class="pub-year-label">2020</span><div class="pub-year-line"></div></div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Topological Edge States in Bowtie Ladders with Different Cutting Edges</div>
+          <div class="pub-meta">Jung-Wan Ryu, Sungjong Woo, Nojoon Myoung, Hee Chul Park</div>
+          <div class="pub-journal">arXiv:2012.00270 (2020)</div>
+        </div>
+        <a href="https://arxiv.org/abs/2012.00270" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+    </div>
+
+    <!-- 2019 -->
+    <div class="pub-year-group">
+      <div class="pub-year-header"><span class="pub-year-label">2019</span><div class="pub-year-line"></div></div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Emergent Localized States at the Interface of a Twofold PT-Symmetric Lattice</div>
+          <div class="pub-meta">Jung-Wan Ryu, Nojoon Myoung, Sungjong Woo, Ara Go, Sang-Jun Choi, Hee Chul Park</div>
+          <div class="pub-journal">Physical Review B (2019)</div>
+        </div>
+        <a href="https://arxiv.org/abs/1904.00444" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Manipulation of Valley Isospins in Strained Graphene for Valleytronics</div>
+          <div class="pub-meta">Nojoon Myoung, Hyungkook Choi, Hee Chul Park</div>
+          <div class="pub-journal">Physical Review Applied (2019)</div>
+        </div>
+        <a href="https://arxiv.org/abs/1907.09079" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+    </div>
+
+    <!-- 2018 -->
+    <div class="pub-year-group">
+      <div class="pub-year-header"><span class="pub-year-label">2018</span><div class="pub-year-line"></div></div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Flat-Band Localization and Self-Collimation of Light in Photonic Crystals</div>
+          <div class="pub-meta">Nojoon Myoung, Hee Chul Park, Ajith Ramachandran, Elefterios Lidorikis, Jung-Wan Ryu</div>
+          <div class="pub-journal">Scientific Reports (2019)</div>
+        </div>
+        <a href="https://arxiv.org/abs/1801.08671" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+    </div>
+
+    <!-- 2017 -->
+    <div class="pub-year-group">
+      <div class="pub-year-header"><span class="pub-year-label">2017</span><div class="pub-year-line"></div></div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Antiresonance Induced by Symmetry-Broken Contacts in Quasi-One-Dimensional Lattices</div>
+          <div class="pub-meta">Jung-Wan Ryu, Nojoon Myoung, Hee Chul Park</div>
+          <div class="pub-journal">Physical Review B 96 (2017)</div>
+        </div>
+        <a href="https://arxiv.org/abs/1709.00130" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Conductance Oscillations in Chern Insulator Junctions: Valley-Isospin Dependence and Aharonov-Bohm Effects</div>
+          <div class="pub-meta">Nojoon Myoung, Hee Chul Park</div>
+          <div class="pub-journal">Physical Review B 95 (2017)</div>
+        </div>
+        <a href="https://arxiv.org/abs/1702.00578" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+    </div>
+
+    <!-- 2016 -->
+    <div class="pub-year-group">
+      <div class="pub-year-header"><span class="pub-year-label">2016</span><div class="pub-year-line"></div></div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Interacting Ultracold Atomic Kicked Rotors: Dynamical Localization?</div>
+          <div class="pub-meta">Pinquan Qin, Alexei Andreanov, Hee Chul Park, Sergej Flach</div>
+          <div class="pub-journal">Scientific Reports 7, 41139 (2017)</div>
+        </div>
+        <a href="https://arxiv.org/abs/1606.08964" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+    </div>
+
+    <!-- 2014 -->
+    <div class="pub-year-group">
+      <div class="pub-year-header"><span class="pub-year-label">2014</span><div class="pub-year-line"></div></div>
+
+      <div class="pub-item">
+        <div>
+          <div class="pub-title">Manifestation of Axion Electrodynamics through Magnetic Ordering on Edges of Topological Insulator</div>
+          <div class="pub-meta">Yea-Lee Lee, Hee Chul Park, Jisoon Ihm, Young-Woo Son</div>
+          <div class="pub-journal">arXiv:1411.3831 (2014)</div>
+        </div>
+        <a href="https://arxiv.org/abs/1411.3831" target="_blank" class="pub-link">arXiv ↗</a>
+      </div>
+    </div>
+
+    <p style="color:var(--mid);font-size:.8rem;margin-top:3rem;font-family:'Space Mono',monospace;">
+      * Google Scholar가 robots.txt로 자동 수집을 차단하므로 최신 목록은 직접 확인 후 업데이트 권장. →
+      <a href="https://scholar.google.com/citations?user=0IigmmoAAAAJ&hl=ko" target="_blank" style="color:var(--accent);">Google Scholar ↗</a>
+    </p>
+  </div>
+</div>
+
+<!-- ══ MEMBERS ══ -->
+<div class="page" id="page-members">
+  <div class="page-inner">
+    <p class="section-tag">// Members</p>
+    <h2>The Team</h2>
+
+    <div class="member-group">
+      <div class="member-category-header">
+        <span class="member-category-label">Principal Investigator</span>
+        <div class="member-category-line"></div>
+      </div>
+      <div class="members-grid">
+        <div class="member-card pi">
+          <div class="member-avatar">HC</div>
+          <div class="member-name">Prof. Hee Chul Park</div>
+          <div class="member-role">Professor</div>
+          <div class="member-info">Pukyong National University<br>Department of Physics<br><span style="color:var(--accent);font-size:.72rem;">hcpark@pknu.ac.kr</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="member-group">
+      <div class="member-category-header">
+        <span class="member-category-label">Postdoctoral Researchers</span>
+        <div class="member-category-line"></div>
+      </div>
+      <div class="members-grid">
+        <div class="member-card">
+          <div class="member-avatar">P1</div>
+          <div class="member-name">[Name]</div>
+          <div class="member-role">Postdoc</div>
+          <div class="member-info">Research Topic</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="member-group">
+      <div class="member-category-header">
+        <span class="member-category-label">Graduate Students (Ph.D / M.S)</span>
+        <div class="member-category-line"></div>
+      </div>
+      <div class="members-grid">
+        <div class="member-card">
+          <div class="member-avatar">G1</div>
+          <div class="member-name">[Name]</div>
+          <div class="member-role">Ph.D Student</div>
+          <div class="member-info">Research Topic</div>
+        </div>
+        <div class="member-card">
+          <div class="member-avatar">G2</div>
+          <div class="member-name">[Name]</div>
+          <div class="member-role">Ph.D Student</div>
+          <div class="member-info">Research Topic</div>
+        </div>
+        <div class="member-card">
+          <div class="member-avatar">G3</div>
+          <div class="member-name">[Name]</div>
+          <div class="member-role">M.S Student</div>
+          <div class="member-info">Research Topic</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="member-group">
+      <div class="member-category-header">
+        <span class="member-category-label">Undergraduate Students</span>
+        <div class="member-category-line"></div>
+      </div>
+      <div class="members-grid">
+        <div class="member-card">
+          <div class="member-avatar">U1</div>
+          <div class="member-name">[Name]</div>
+          <div class="member-role">Undergraduate</div>
+          <div class="member-info">Research Intern</div>
+        </div>
+      </div>
+    </div>
+
+    <p style="color:var(--mid);font-size:.85rem;margin-top:2.5rem;">
+      We are actively recruiting motivated graduate students and postdocs. →
+      <span style="color:var(--accent);cursor:pointer;" onclick="showPage('contact')">Get in touch</span>
+    </p>
+  </div>
+</div>
+
+<!-- ══ NEWS ══ -->
+<div class="page" id="page-news">
+  <div class="page-inner">
+    <p class="section-tag">// News</p>
+    <h2>Latest Updates</h2>
+    <div class="news-grid">
+      <div class="news-card">
+        <div class="news-date">2025. 06</div>
+        <div class="news-title">Nano Letters — Diamond Molecular Balance</div>
+        <div class="news-body">Our paper on ultra-wide range nanomechanical mass spectrometry (MDa to TDa) using a diamond molecular balance has been published in Nano Letters.</div>
+      </div>
+      <div class="news-card">
+        <div class="news-date">2025. 04</div>
+        <div class="news-title">Nonorientable Exceptional Points — PRA</div>
+        <div class="news-body">Our work on nonorientable exceptional points in the Klein Brillouin zone has appeared in Physical Review A 112, 052223 (2025).</div>
+      </div>
+      <div class="news-card">
+        <div class="news-date">2025. 03</div>
+        <div class="news-title">Pseudo-Hermitian Topology — PRA</div>
+        <div class="news-body">Collaborative work on pseudo-Hermitian topology of multiband non-Hermitian systems published in Phys. Rev. A 111, 042205 (2025).</div>
+      </div>
+      <div class="news-card">
+        <div class="news-date">2024. 03</div>
+        <div class="news-title">Exceptional Classifications — Communications Physics</div>
+        <div class="news-body">Our exhaustive EP classification framework for non-Hermitian systems published in Communications Physics 7, 109 (2024).</div>
+      </div>
+      <div class="news-card">
+        <div class="news-date">2023. 05</div>
+        <div class="news-title">Wave Chaos — Light: Science &amp; Applications</div>
+        <div class="news-body">Bloch-theorem-dictated wave chaos in microcavity crystals published in Light: Sci. &amp; App. 12, 106 (2023). Highlighted by PHYS.ORG.</div>
+      </div>
+      <div class="news-card">
+        <div class="news-date">2023. 09</div>
+        <div class="news-title">Non-Hermitian Hopf Bundle — Communications Physics</div>
+        <div class="news-body">Non-Hermitian Hopf bundle matter realized experimentally using topolectric circuits. Published in Communications Physics 6, 273 (2023).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONTACT ══ -->
+<div class="page" id="page-contact">
+  <div class="page-inner">
+    <p class="section-tag">// Contact</p>
+    <h2>Get In Touch</h2>
+    <div class="contact-wrap">
+      <div class="contact-info">
+        <p>We welcome inquiries from prospective students, postdocs, and collaborators interested in quantum and nanoscale theory.</p>
+        <div class="info-row"><span class="info-label">PI</span><span class="info-val">Prof. Hee Chul Park</span></div>
+        <div class="info-row"><span class="info-label">Email</span><span class="info-val">hcpark@pknu.ac.kr</span></div>
+        <div class="info-row"><span class="info-label">Phone</span><span class="info-val">+82-51-XXXX-XXXX</span></div>
+        <div class="info-row"><span class="info-label">Location</span><span class="info-val">45 Yongso-ro, Nam-gu, Busan 48513, Korea</span></div>
+        <div class="info-row"><span class="info-label">Dept.</span><span class="info-val">Department of Physics, PKNU</span></div>
+        <div class="info-row"><span class="info-label">Scholar</span><span class="info-val"><a href="https://scholar.google.com/citations?user=0IigmmoAAAAJ&hl=ko" target="_blank" style="color:var(--accent);">Google Scholar ↗</a></span></div>
+      </div>
+      <form class="contact-form" onsubmit="return false;">
+        <input type="text"  placeholder="Name" />
+        <input type="email" placeholder="Email" />
+        <input type="text"  placeholder="Subject" />
+        <textarea placeholder="Message"></textarea>
+        <button type="submit">Send Message →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">QNT Lab</div>
+  <p>Quantum Nano Theory · Pukyong National University · © 2025</p>
+</footer>
+
+<script>
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav ul li').forEach(li => li.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (page) page.classList.add('active');
+  const navItem = document.getElementById('nav-' + name);
+  if (navItem) navItem.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+showPage('home');
+</script>
+</body>
+</html>
