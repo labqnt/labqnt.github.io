@@ -628,3 +628,19 @@ footer {
   .pub-item { grid-template-columns: 2rem 1fr; }
   .pub-year { grid-column: 2; }
 }
+
+/* Footer no-wrap fix */
+.footer-info {
+  white-space: nowrap;
+}
+
+.footer-info div {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .footer-info,
+  .footer-info div {
+    white-space: normal;
+  }
+}
