@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QNT Lab — Quantum & Nano Theory | 부경대학교 물리학과</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Noto+Sans+KR:wght@300;400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050a14;
+    --surface: #0b1627;
+    --surface2: #0f1e38;
+    --accent: #00d4ff;
+    --accent2: #7b5ea7;
+    --accent3: #ff6b35;
+    --text: #e8edf5;
+    --text-muted: #7a8fa8;
+    --border: rgba(0, 212, 255, 0.15);
+    --glow: rgba(0, 212, 255, 0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem 3rem;
+    background: rgba(5, 10, 20, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 8rem 3rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 50%, rgba(0, 212, 255, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(123, 94, 167, 0.08) 0%, transparent 50%);
+  }
+  .quantum-grid {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 750px; }
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 40px; height: 1px;
+    background: var(--accent);
+  }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 10vw, 8rem);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.5rem;
+  }
+  h1 .line1 { color: var(--text); }
+  h1 .line2 { color: var(--accent); }
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    margin: 1.8rem 0 2.5rem;
+    line-height: 1.7;
+    max-width: 550px;
+  }
+  .hero-cta {
+    display: flex; gap: 1.2rem; flex-wrap: wrap;
+  }
+  .btn-primary {
+    padding: 0.85rem 2rem;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none; cursor: pointer;
+    transition: all 0.2s;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+  .btn-primary:hover { background: #fff; transform: translateY(-2px); }
+  .btn-outline {
+    padding: 0.85rem 2rem;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* floating atoms */
+  .atom {
+    position: absolute; right: 5%; top: 50%;
+    transform: translateY(-50%);
+    width: 380px; height: 380px;
+    opacity: 0.18;
+    z-index: 0;
+  }
+  .atom-ring {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    animation: spin 12s linear infinite;
+  }
+  .atom-ring:nth-child(2) { transform: rotateX(60deg); animation-duration: 18s; animation-direction: reverse; }
+  .atom-ring:nth-child(3) { transform: rotateY(60deg) rotateX(30deg); animation-duration: 24s; }
+  .atom-core {
+    position: absolute; inset: 40%;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── SECTION BASE ── */
+  section { padding: 6rem 3rem; }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .section-label::before { content: '//'; opacity: 0.5; }
+  h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    letter-spacing: 0.05em;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  /* ── RESEARCH AREAS ── */
+  .research { background: var(--surface); }
+  .research-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5px;
+    margin-top: 3.5rem;
+    border: 1px solid var(--border);
+  }
+  .research-card {
+    background: var(--bg);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+    cursor: default;
+  }
+  .research-card:hover { background: var(--surface2); }
+  .research-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--accent);
+    transition: height 0.3s;
+  }
+  .research-card:hover::before { height: 100%; }
+  .card-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    color: rgba(0, 212, 255, 0.08);
+    line-height: 1;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .card-icon { font-size: 1.8rem; margin-bottom: 1rem; display: block; }
+  .card-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+  }
+  .card-desc {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* ── PROFESSOR ── */
+  .professor { background: var(--bg); }
+  .prof-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 5rem;
+    align-items: start;
+    margin-top: 3rem;
+  }
+  .prof-photo-wrap {
+    position: sticky; top: 7rem;
+  }
+  .prof-photo {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .prof-photo::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .prof-name-plate {
+    padding: 1.2rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+  }
+  .prof-name-kr {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .prof-name-en {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+  .prof-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    margin-top: 0.5rem;
+  }
+  .prof-contact {
+    margin-top: 1.2rem;
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .contact-row {
+    display: flex; gap: 0.8rem; align-items: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+  .contact-row span:first-child { color: var(--accent); min-width: 3rem; }
+
+  .prof-info h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 2.5rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .prof-info h3:first-child { margin-top: 0; }
+  .info-list { list-style: none; }
+  .info-list li {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    display: flex; gap: 0.8rem; align-items: baseline;
+    line-height: 1.5;
+  }
+  .info-list li::before { content: '—'; color: var(--accent); opacity: 0.5; flex-shrink: 0; }
+
+  /* ── PUBLICATIONS ── */
+  .publications { background: var(--surface); }
+  .pub-tabs {
+    display: flex; gap: 0;
+    margin: 2.5rem 0 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .pub-tab {
+    padding: 0.7rem 1.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+    background: none; border-left: none; border-right: none; border-top: none;
+  }
+  .pub-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .pub-tab:hover:not(.active) { color: var(--text); }
+  .pub-list { display: flex; flex-direction: column; gap: 1px; }
+  .pub-item {
+    background: var(--bg);
+    padding: 1.5rem 2rem;
+    display: grid;
+    grid-template-columns: 2.5rem 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+    transition: background 0.2s;
+  }
+  .pub-item:hover { background: var(--surface2); }
+  .pub-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: rgba(0, 212, 255, 0.2);
+    line-height: 1;
+    text-align: right;
+  }
+  .pub-title {
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 0.3rem;
+  }
+  .pub-journal {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+  .pub-year {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    color: var(--accent2);
+    white-space: nowrap;
+  }
+  .show-more {
+    margin: 2rem auto 0;
+    display: block;
+    width: fit-content;
+    padding: 0.75rem 2.5rem;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .show-more:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── MEMBERS ── */
+  .members { background: var(--bg); }
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5px;
+    margin-top: 3rem;
+  }
+  .member-card {
+    background: var(--surface);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .member-card:hover { border-color: var(--border); background: var(--surface2); }
+  .member-avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    margin: 0 auto 1rem;
+  }
+  .member-name { font-size: 1rem; font-weight: 500; margin-bottom: 0.3rem; }
+  .member-role {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent);
+    line-height: 1.4;
+  }
+
+  /* ── NEWS ── */
+  .news { background: var(--surface); }
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5px;
+    margin-top: 3rem;
+  }
+  .news-card {
+    background: var(--bg);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+  .news-card:hover { background: var(--surface2); }
+  .news-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+  }
+  .news-headline {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .news-body { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #020508;
+    border-top: 1px solid var(--border);
+    padding: 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .footer-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+  .footer-info {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 2;
+    text-align: right;
+  }
+  .footer-info span { color: var(--accent); }
+  .footer-copy {
+    grid-column: 1/-1;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: rgba(122, 143, 168, 0.4);
+    text-align: center;
+  }
+
+  /* Scroll animations */
+  .fade-in { opacity: 0; transform: translateY(30px); transition: all 0.7s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* Hidden publications */
+  .pub-hidden { display: none; }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 4rem 1.5rem; }
+    .prof-layout { grid-template-columns: 1fr; }
+    footer { grid-template-columns: 1fr; }
+    .footer-info { text-align: left; }
+    .atom { display: none; }
+    h1 { font-size: clamp(3rem, 15vw, 5rem); }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">QNT_LAB</div>
+  <ul class="nav-links">
+    <li><a href="#research">Research</a></li>
+    <li><a href="#professor">PI</a></li>
+    <li><a href="#publications">Publications</a></li>
+    <li><a href="#members">Members</a></li>
+    <li><a href="#news">News</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="quantum-grid"></div>
+  <div class="atom">
+    <div class="atom-ring"></div>
+    <div class="atom-ring"></div>
+    <div class="atom-ring"></div>
+    <div class="atom-core"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-tag">Quantum &amp; Nano Theory Laboratory</div>
+    <h1>
+      <div class="line1">QUANTUM</div>
+      <div class="line2">NANO</div>
+      <div class="line1">THEORY</div>
+    </h1>
+    <p class="hero-sub">
+      양자 나노 소자, 위상 물질, 비평형 물리의 경계를 탐구합니다.<br>
+      부경대학교 물리학과 박희철 교수 연구실에 오신 것을 환영합니다.
+    </p>
+    <div class="hero-cta">
+      <a href="#research" class="btn-primary">연구 소개</a>
+      <a href="#publications" class="btn-outline">논문 목록</a>
+    </div>
+  </div>
+</section>
+
+<!-- RESEARCH AREAS -->
+<section class="research" id="research">
+  <div class="section-label">Research Areas</div>
+  <h2>연구 분야</h2>
+  <div class="research-grid fade-in">
+    <div class="research-card">
+      <span class="card-num">01</span>
+      <span class="card-icon">⚛️</span>
+      <div class="card-title">응집 물질 물리 이론<br>Condensed Matter Theory</div>
+      <p class="card-desc">고체 내 전자의 집단적 거동을 이론적으로 규명합니다. 위상 절연체, 그래핀, 반데르발스 이종 구조 등 신규 물질계의 전자 구조 및 수송 현상을 탐구합니다.</p>
+    </div>
+    <div class="research-card">
+      <span class="card-num">02</span>
+      <span class="card-icon">🔬</span>
+      <div class="card-title">양자 나노 소자<br>Quantum Nano Theory</div>
+      <p class="card-desc">나노미터 스케일 소자에서의 양자 수송, 쿨롱 블로케이드, 코도 효과, 전자-진동 결합 등을 이론적으로 분석합니다. 나노기계 셔틀 소자 연구를 수행합니다.</p>
+    </div>
+    <div class="research-card">
+      <span class="card-num">03</span>
+      <span class="card-icon">🌀</span>
+      <div class="card-title">위상 물질<br>Topological Matters</div>
+      <p class="card-desc">벌크-경계 대응, 처른 절연체, 위상 평탄 밴드, 비에르미트 위상학 등을 연구합니다. 뫼비우스 띠 위상, PT 대칭 격자, 예외점 분류를 포함합니다.</p>
+    </div>
+    <div class="research-card">
+      <span class="card-num">04</span>
+      <span class="card-icon">🔮</span>
+      <div class="card-title">양자 기술<br>Quantum Technology</div>
+      <p class="card-desc">쿠퍼쌍 비행 큐비트, 나노기계 고양이 상태, 양자 정보 처리 이론을 연구합니다. 초전도 근접 효과 기반 양자 소자 설계를 탐색합니다.</p>
+    </div>
+    <div class="research-card">
+      <span class="card-num">05</span>
+      <span class="card-icon">⚡</span>
+      <div class="card-title">비평형 물리<br>Out of Equilibrium</div>
+      <p class="card-desc">열적·비열적 조건에서 나노 소자의 동역학을 기술합니다. 킥 유도 전류 정류, 마흐-젠더 간섭, 스핀 전류 생성 등을 포함합니다.</p>
+    </div>
+    <div class="research-card">
+      <span class="card-num">06</span>
+      <span class="card-icon">🕸️</span>
+      <div class="card-title">그래핀 & 2D 물질<br>Graphene & 2D Materials</div>
+      <p class="card-desc">그래핀, MoS₂, 헥사고날 질화붕소 등 이차원 물질의 변형, 나노버블, 밸리 이소스핀, 계면 터널링 특성을 연구합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROFESSOR -->
+<section class="professor" id="professor">
+  <div class="section-label">Principal Investigator</div>
+  <h2>지도교수</h2>
+  <div class="prof-layout fade-in">
+    <div class="prof-photo-wrap">
+      <div class="prof-photo">🧑‍🔬</div>
+      <div class="prof-name-plate">
+        <div class="prof-name-kr">박 희 철</div>
+        <div class="prof-name-en">Heecheol Park, Ph.D.</div>
+        <div class="prof-title">Assistant Professor</div>
+        <div class="prof-contact">
+          <div class="contact-row"><span>OFFICE</span><span>자연과학대학(B15) 5115호</span></div>
+          <div class="contact-row"><span>TEL</span><span>051-629-5564</span></div>
+          <div class="contact-row"><span>EMAIL</span><span>hcpark@pknu.ac.kr</span></div>
+          <div class="contact-row"><span>DEPT</span><span>물리학과</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="prof-info">
+      <h3>학력 Education</h3>
+      <ul class="info-list">
+        <li>PhD, 충남대학교 (Chungnam National University), 2010</li>
+      </ul>
+      <h3>경력 Career</h3>
+      <ul class="info-list">
+        <li>부경대학교 물리학과 교수 (2023.03 ~ 현재)</li>
+        <li>기초과학연구원 복잡계이론물리연구단 IBS-PCS (2015.05 ~)</li>
+        <li>고등과학연구원 KIAS (2011.10 ~)</li>
+        <li>Gothenburg University, Sweden (2010.03 ~)</li>
+      </ul>
+      <h3>주요 연구 주제 Key Topics</h3>
+      <ul class="info-list">
+        <li>비에르미트 위상학 (Non-Hermitian Topology) — Exceptional points, PT symmetry</li>
+        <li>그래핀 나노버블 양자 소자 — Strain-induced quantum dots, Mach-Zehnder interferometry</li>
+        <li>양자 나노기계 시스템 — Cooper-pair box qubit, nanomechanical cat states</li>
+        <li>위상 평탄 밴드 — Compact localized states, flat-band generators</li>
+        <li>광자 결정 토폴로지 — Floquet media, Moir&eacute; superlattices</li>
+        <li>스핀트로닉스 — Spin-orbit coupling, magnetic shuttle devices</li>
+      </ul>
+      <h3>주요 게재 저널 Journals</h3>
+      <ul class="info-list">
+        <li>Physical Review Letters · Physical Review B · Physical Review A · Physical Review Applied</li>
+        <li>Nature Communications · npj Quantum Information · Science Advances</li>
+        <li>Light: Science &amp; Applications · Quantum Science and Technology</li>
+        <li>Communications Physics · New Journal of Physics · Carbon</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PUBLICATIONS -->
+<section class="publications" id="publications">
+  <div class="section-label">Publications</div>
+  <h2>논문 목록</h2>
+  <p style="color:var(--text-muted);font-size:0.9rem;">총 61편 (2006–2025) · 국제 SCI급 저널</p>
+
+  <div class="pub-tabs">
+    <button class="pub-tab active" onclick="filterPubs('all', this)">전체 (61)</button>
+    <button class="pub-tab" onclick="filterPubs('recent', this)">최근 5년</button>
+    <button class="pub-tab" onclick="filterPubs('nature', this)">Nature/Science 계열</button>
+  </div>
+
+  <div class="pub-list" id="pubList">
+    <div class="pub-item" data-year="2025" data-type="all">
+      <div class="pub-num">61</div>
+      <div><div class="pub-title">Andreev probing of a Cooper-pair flying qubit</div><div class="pub-journal">Physical Review B, 111, 165404</div></div>
+      <div class="pub-year">2025</div>
+    </div>
+    <div class="pub-item" data-year="2025" data-type="all">
+      <div class="pub-num">60</div>
+      <div><div class="pub-title">Pseudo-Hermitian topology in multiband non-Hermitian systems</div><div class="pub-journal">Physical Review A, 111, 042205</div></div>
+      <div class="pub-year">2025</div>
+    </div>
+    <div class="pub-item" data-year="2025" data-type="all">
+      <div class="pub-num">59</div>
+      <div><div class="pub-title">Magnetism in twisted triangular bilayer graphene quantum dots</div><div class="pub-journal">Physical Review B, 111, 024417</div></div>
+      <div class="pub-year">2025</div>
+    </div>
+    <div class="pub-item" data-year="2024" data-type="all">
+      <div class="pub-num">58</div>
+      <div><div class="pub-title">Orthogonal flatbands in Hamiltonians with local symmetry</div><div class="pub-journal">Journal of Physics A, v.57, 1751</div></div>
+      <div class="pub-year">2024</div>
+    </div>
+    <div class="pub-item" data-year="2024" data-type="all">
+      <div class="pub-num">57</div>
+      <div><div class="pub-title">Engineering high Chern number insulators</div><div class="pub-journal">Journal of the Korean Physical Society, 85, 661</div></div>
+      <div class="pub-year">2024</div>
+    </div>
+    <div class="pub-item" data-year="2024" data-type="nature">
+      <div class="pub-num">56</div>
+      <div><div class="pub-title">Exceptional classifications of non-Hermitian systems</div><div class="pub-journal">Communications Physics, 7, 109</div></div>
+      <div class="pub-year">2024</div>
+    </div>
+    <div class="pub-item" data-year="2024" data-type="all">
+      <div class="pub-num">55</div>
+      <div><div class="pub-title">Detecting Strain effects due to nanobubbles in graphene Mach-Zehnder interferometers</div><div class="pub-journal">Physica Status Solidi B, 261, 2300379</div></div>
+      <div class="pub-year">2024</div>
+    </div>
+    <div class="pub-item pub-hidden" data-year="2023" data-type="nature">
+      <div class="pub-num">53</div>
+      <div><div class="pub-title">Realization of non-Hermitian Hopf bundle matter</div><div class="pub-journal">Communications Physics, 6, 273</div></div>
+      <div class="pub-year">2023</div>
+    </div>
+    <div class="pub-item pub-hidden" data-year="2023" data-type="nature">
+      <div class="pub-num">50</div>
+      <div><div class="pub-title">Bloch Theorem Dictated Wave Chaos in Microcavity Crystals</div><div class="pub-journal">Light: Science &amp; Applications, 12, 106</div></div>
+      <div class="pub-year">2023</div>
+    </div>
+    <div class="pub-item pub-hidden" data-year="2022" data-type="nature">
+      <div class="pub-num">44</div>
+      <div><div class="pub-title">Nanomechanical Cat states generated by a dc voltage-driven Cooper pair box qubit</div><div class="pub-journal">npj Quantum Information, 8, 74</div></div>
+      <div class="pub-year">2022</div>
+    </div>
+    <div class="pub-item pub-hidden" data-year="2022" data-type="nature">
+      <div class="pub-num">47</div>
+      <div><div class="pub-title">Revealing non-Hermitian band structure of photonic Floquet media</div><div class="pub-journal">Science Advances, 8, eabo6220</div></div>
+      <div class="pub-year">2022</div>
+    </div>
+    <div class="pub-item pub-hidden" data-year="2022" data-type="nature">
+      <div class="pub-num">46</div>
+      <div><div class="pub-title">Strong interlayer coupling and stable topological flat bands in twisted bilayer photonic Moiré superlattices</div><div class="pub-journal">Light: Science &amp; Applications, 11, 289</div></div>
+      <div class="pub-year">2022</div>
+    </div>
+    <div class="pub-item pub-hidden" data-year="2017" data-type="nature">
+      <div class="pub-num">18</div>
+      <div><div class="pub-title">Strain-shear coupling in bilayer MoS₂</div><div class="pub-journal">Nature Communications, 8, 1370</div></div>
+      <div class="pub-year">2017</div>
+    </div>
+    <div class="pub-item pub-hidden" data-year="2015" data-type="nature">
+      <div class="pub-num">8</div>
+      <div><div class="pub-title">Manifestation of axion electrodynamics through magnetic ordering on edges of topological insulator</div><div class="pub-journal">PNAS, 112, 11514</div></div>
+      <div class="pub-year">2015</div>
+    </div>
+    <div class="pub-item pub-hidden" data-year="2006" data-type="all">
+      <div class="pub-num">2</div>
+      <div><div class="pub-title">Current rectification by spontaneous symmetry breaking in coupled nanomechanical shuttles</div><div class="pub-journal">Physical Review Letters, 97, 216804</div></div>
+      <div class="pub-year">2006</div>
+    </div>
+  </div>
+
+  <button class="show-more" onclick="toggleMore(this)">더 보기 ↓</button>
+</section>
+
+<!-- MEMBERS -->
+<section class="members" id="members">
+  <div class="section-label">Lab Members</div>
+  <h2>연구실 구성원</h2>
+  <div class="members-grid fade-in">
+    <div class="member-card">
+      <div class="member-avatar">🧑‍🔬</div>
+      <div class="member-name">박희철</div>
+      <div class="member-role">Principal Investigator<br>교수</div>
+    </div>
+    <div class="member-card">
+      <div class="member-avatar">🎓</div>
+      <div class="member-name">박사과정생</div>
+      <div class="member-role">PhD Student<br>모집 중</div>
+    </div>
+    <div class="member-card">
+      <div class="member-avatar">📚</div>
+      <div class="member-name">석사과정생</div>
+      <div class="member-role">MS Student<br>모집 중</div>
+    </div>
+    <div class="member-card">
+      <div class="member-avatar">🔭</div>
+      <div class="member-name">학부 연구생</div>
+      <div class="member-role">Undergraduate<br>모집 중</div>
+    </div>
+  </div>
+  <p style="margin-top:2rem;font-family:'Space Mono',monospace;font-size:0.78rem;color:var(--accent);text-align:center;">
+    ※ 대학원생 및 학부연구생을 모집합니다. 관심 있으신 분은 이메일로 문의 바랍니다.
+  </p>
+</section>
+
+<!-- NEWS -->
+<section class="news" id="news">
+  <div class="section-label">Latest News</div>
+  <h2>최신 소식</h2>
+  <div class="news-grid fade-in">
+    <div class="news-card">
+      <div class="news-date">2025.04</div>
+      <div class="news-headline">새 논문 게재: Andreev probing of a Cooper-pair flying qubit</div>
+      <p class="news-body">Physical Review B (111, 165404)에 쿠퍼쌍 비행 큐비트의 안드레예프 탐침 연구가 게재되었습니다.</p>
+    </div>
+    <div class="news-card">
+      <div class="news-date">2025.03</div>
+      <div class="news-headline">새 논문 게재: Pseudo-Hermitian topology in multiband systems</div>
+      <p class="news-body">Physical Review A (111, 042205)에 다중밴드 비에르미트 시스템의 유사에르미트 위상학 연구가 게재되었습니다.</p>
+    </div>
+    <div class="news-card">
+      <div class="news-date">2025.01</div>
+      <div class="news-headline">새 논문 게재: Twisted bilayer graphene quantum dots</div>
+      <p class="news-body">Physical Review B (111, 024417)에 뒤틀린 이중층 그래핀 양자점의 자성 연구가 게재되었습니다.</p>
+    </div>
+    <div class="news-card">
+      <div class="news-date">2024.07</div>
+      <div class="news-headline">Comm. Physics: Exceptional classifications 논문 게재</div>
+      <p class="news-body">비에르미트 시스템의 예외점 분류 체계를 다룬 연구가 Communications Physics (7, 109)에 게재되었습니다.</p>
+    </div>
+    <div class="news-card">
+      <div class="news-date">2023.03</div>
+      <div class="news-headline">부경대학교 물리학과 부임</div>
+      <p class="news-body">박희철 교수가 부경대학교 물리학과에 부임하였습니다. QNT 연구실을 개설합니다.</p>
+    </div>
+    <div class="news-card">
+      <div class="news-date">2023.03</div>
+      <div class="news-headline">Comm. Physics: Non-Hermitian Hopf bundle matter</div>
+      <p class="news-body">비에르미트 홉프 번들 물질 실현 연구가 Communications Physics (6, 273)에 게재되었습니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">QNT LAB</div>
+    <div class="footer-sub">
+      Quantum &amp; Nano Theory Laboratory<br>
+      국립부경대학교 물리학과<br>
+      Department of Physics<br>
+      Pukyong National University
+    </div>
+  </div>
+  <div class="footer-info">
+    <div><span>ADDRESS</span> 부산광역시 남구 용소로 45</div>
+    <div><span>BUILDING</span> 자연과학대학(B15) 5115호</div>
+    <div><span>TEL</span> 051-629-5564</div>
+    <div><span>EMAIL</span> hcpark@pknu.ac.kr</div>
+    <div><span>GOOGLE SCHOLAR</span> 0IigmmoAAAAJ</div>
+  </div>
+  <div class="footer-copy">
+    © 2025 QNT Lab, Pukyong National University. All rights reserved.
+  </div>
+</footer>
+
+<script>
+// Scroll fade-in
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+// Show more publications
+function toggleMore(btn) {
+  const hidden = document.querySelectorAll('.pub-hidden');
+  const showing = btn.dataset.showing === 'true';
+  hidden.forEach(el => {
+    if (!el.classList.contains('filter-hidden')) {
+      el.style.display = showing ? 'none' : 'grid';
+    }
+  });
+  btn.dataset.showing = !showing;
+  btn.textContent = showing ? '더 보기 ↓' : '접기 ↑';
+}
+
+// Publication filter
+function filterPubs(type, btn) {
+  document.querySelectorAll('.pub-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const items = document.querySelectorAll('.pub-item');
+  const currentYear = 2025;
+  items.forEach(item => {
+    const year = parseInt(item.dataset.year);
+    let show = false;
+    if (type === 'all') show = true;
+    else if (type === 'recent') show = (currentYear - year) <= 5;
+    else if (type === 'nature') show = item.dataset.type === 'nature';
+    item.style.display = show ? 'grid' : 'none';
+  });
+}
+</script>
+</body>
+</html>
