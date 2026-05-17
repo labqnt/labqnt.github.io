@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>News | QNT Lab</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+  .news-list {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .news-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(8, 22, 38, 0.88);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .news-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 16px;
+    background: rgba(8, 22, 38, 0.9);
+    border: 1px solid rgba(0, 212, 255, 0.18);
+  }
+
+  .news-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .news-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .news-date {
+    margin-bottom: 0.65rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .news-title {
+    margin-bottom: 0.75rem;
+    color: var(--text-main);
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .news-desc {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+
+  @media (max-width: 820px) {
+    .news-card {
+      grid-template-columns: 1fr;
+      padding: 1rem;
+    }
+
+    .news-title {
+      font-size: 1.05rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">QNT_LAB</a>
+
+ <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+  <ul class="nav-links" id="navLinks">
+    <li><a href="research.html">Research</a></li>
+    <li><a href="pi.html">PI</a></li>
+    <li><a href="publications.html">Publications</a></li>
+    <li><a href="members.html">Members</a></li>
+    <li><a href="news.html">News</a></li>
+  </ul>
+</nav>
+
+
+<main class="page">
+  <div class="page-header">
+    <div class="page-kicker">Latest News</div>
+    <h2>News</h2>
+    <p class="page-subtitle">Recent activities and updates from the Quantum &amp; Nano Theory Laboratory.</p>
+  </div>
+
+  <div class="news-list fade-in">
+    <article class="news-card">
+      <div class="news-image">
+        <img src="images/news/2026_QNT.jpeg" alt="QNT Lab group photo during the 2026 pink campus season">
+      </div>
+      <div class="news-content">
+        <div class="news-date">2026 · Pink Campus Season</div>
+        <div class="news-title">QNT Lab Group Photo, 2026</div>
+        <div class="news-desc">
+          QNT Lab gathered for a new group photo under the spring cherry blossoms during the 2026 pink campus season.
+        </div>
+      </div>
+    </article>
+
+    <article class="news-card">
+      <div class="news-image">
+        <img src="images/news/2023_QNT.jpeg" alt="First QNT Lab group photo during the 2023 cherry blossom season">
+      </div>
+      <div class="news-content">
+        <div class="news-date">2023 · Pink Campus Season</div>
+        <div class="news-title">First QNT Lab Group Photo, 2023</div>
+        <div class="news-desc">
+          QNT Lab took its first group photo together in the cherry blossom season, marking an early milestone for the laboratory.
+        </div>
+      </div>
+    </article>
+  </div>
+</main>
+
+
+<footer>
+  <div>
+    <div class="footer-logo">QNT LAB</div>
+    <div class="footer-sub">
+      Quantum &amp; Nano Theory Laboratory<br>
+      Department of Physics<br>
+      Pukyong National University
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <div><span>ADDRESS</span> 45 Yongso-ro, Nam-gu, Busan, Republic of Korea</div>
+    <div><span>BUILDING</span> Natural Science Building (B15), Room 5110</div>
+    <div><span>TEL</span> +82-51-629-5564</div>
+    <div><span>EMAIL</span> hc2725@gmail.com</div>
+    <div><span>GOOGLE SCHOLAR</span> 0IigmmoAAAAJ</div>
+  </div>
+
+  <div class="footer-copy">
+    © 2023 QNT Lab, Pukyong National University. All rights reserved.
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
