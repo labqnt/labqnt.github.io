@@ -698,3 +698,12 @@ footer {
     font-size: 0.85rem;
   }
 }
+.footer-since {
+  margin-top: 0.25rem;
+  margin-bottom: 0.6rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.72rem;
+  color: var(--accent);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
